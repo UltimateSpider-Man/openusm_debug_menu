@@ -8,7 +8,6 @@ set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-static -std=gnu11 -g")
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}
     "-fomit-frame-pointer -m32 -fno-asynchronous-unwind-tables -masm=intel -static -g")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -21,27 +20,56 @@ list(APPEND flags
     "-Wextra"
     "-Wpedantic"
     "-Wcast-align"
-    "-Wcast-qual"
-    "-Wzero-as-null-pointer-constant"
-    #"-Wconversion"
-    "-Wctor-dtor-privacy"
     "-Wduplicated-branches"
     "-Wduplicated-cond"
     "-Wextra-semi"
-    "-Wfloat-equal"
-    #"-Weffc++"
     "-Wlogical-op"
     "-Wnon-virtual-dtor"
-    #"-Wold-style-cast"
     "-Woverloaded-virtual"
-    "-Wredundant-decls"
-    #"-Wsign-conversion"
-    "-Wsign-promo"
     "-Wshift-negative-value"
     "-Wno-invalid-offsetof"
-    "-Wno-deprecated")
+
+    # ── Suppress decompiled-code / IDA-output artifacts ─────────────────
+    "-Wno-deprecated"
+    "-Wno-float-equal"                  # float == / != throughout IDA output
+    "-Wno-sign-compare"                 # signed/unsigned pervasive in decompiled code
+    "-Wno-cast-qual"                    # const-cast-away common in decompiled code
+    "-Wno-cast-align"                   # decompiled pointer casts
+    "-Wno-zero-as-null-pointer-constant" # old C-style 0 for nullptr
+    "-Wno-missing-field-initializers"   # {0} partial struct init
+    "-Wno-class-memaccess"              # memcpy/memset on non-trivial types
+    "-Wno-write-strings"                # string literal -> char*
+    "-Wno-unused-parameter"             # stubs and decompiled functions
+    "-Wno-unused-variable"              # decompiled temporaries
+    "-Wno-unused-but-set-variable"
+    "-Wno-unused-value"
+    "-Wno-unused-label"
+    "-Wno-unused-function"
+    "-Wno-redundant-decls"              # forward-decls duplicating header decls
+    "-Wno-type-limits"                  # uint8_t != 0xFF always-true comparisons
+    "-Wno-narrowing"                    # float->int narrowing in aggregate inits
+    "-Wno-maybe-uninitialized"          # mash-in-place constructors
+    "-Wno-uninitialized"
+    "-Wno-switch"                       # int cases on enum switch (joypad)
+    "-Wno-implicit-fallthrough"         # decompiled switch-case fall-through
+    "-Wno-comment"                      # backslash-continuation in comments
+    "-Wno-parentheses"                  # operator precedence from IDA output
+    "-Wno-unknown-pragmas"              # #pragma region / #pragma endregion
+    "-Wno-format"                       # printf DWORD/%X mismatches
+    "-Wno-misleading-indentation"       # decompiled indentation quirks
+    "-Wno-reorder"                      # member init order in decompiled ctors
+    "-Wno-pedantic"                     # anonymous structs in ngl.h etc.
+    "-Wno-overloaded-virtual"           # consolevars.h hidden setValue overloads
+    "-Wno-ctor-dtor-privacy"
+    "-Wno-sign-promo"
+    "-Wno-return-type"
+    "-Wno-duplicated-cond"
+)
 
 project(USM-dev)
+
+
+
 
 # Lua library setup
 set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/lua/include" CACHE PATH "Lua include directory")
@@ -166,6 +194,10 @@ target_compile_options(nalcomp
   )
 target_include_directories(nalcomp PUBLIC "./src/nalcomp/")
 target_include_directories(nalcomp PUBLIC "./src/")
+
+
+
+
 
 
 file(GLOB_RECURSE NALPANEL_SRC "./src/panels/nalpanel/*.cpp")
@@ -345,6 +377,8 @@ ExternalProject_Add(
         -DCMAKE_CXX_FLAGS=-static-libgcc\ -static-libstdc++
     INSTALL_COMMAND ""
 )
+set(CMAKE_CXX_STANDARD 20)
+
 target_include_directories(openusm PUBLIC "./assimp/include/")
 target_include_directories(USM PUBLIC "./assimp/include/")
 target_link_directories(openusm PUBLIC ${CMAKE_BINARY_DIR}/assimp-build/lib)
