@@ -30,6 +30,10 @@ enum debug_menu_entry_type {
 };
 
 
+
+// Add this to global scope or debug_menu namespace:
+
+
 enum menu_type {
 DEBUG_MENU_ENTRY_TYPE_FLOAT = 4
 };
@@ -103,6 +107,7 @@ struct debug_menu_entry {
 	    debug_menu_entry *prev;
     debug_menu_entry *next;
 		const char* m_name2;
+
 
 const char* get_name() const {
     return this->m_name2;
@@ -490,6 +495,8 @@ struct debug_menu {
     debug_menu_entry *last;
     debug_menu_entry *highlighted;
     mString field_C;
+			int has_editable_values;
+		void* is_user_list;
 
 
 
@@ -521,7 +528,18 @@ struct debug_menu {
 
     static void init();
 	
+    void render_build_info_panel();
+	
+	void msm2_debug_menu();
+	
+	void render_instruction_bar();
+	
+	void init_sm2_style();
+	
+	
+	void set_instruction_text(const char* text);
 
+    void set_context_instruction();
 
     static inline int menu_height = 0;
 
@@ -561,12 +579,38 @@ void render_active();
 
 
 
+
     static inline debug_menu *root_menu = nullptr;
 
 
 static debug_menu* active_menu;
+
+
 		
 };
+
+struct debug_build_info {
+    std::string version;
+    std::string build_machine;
+    std::string code_path;
+    std::string build_time;
+    std::string archive_assets;
+    std::string display_info;
+    
+    // Default initialization with your project info
+    void set_defaults() {
+        version         = "PKG:usm_mod-CL00000001-DEBUG";
+        build_machine   = "DEV_LOCAL";
+        code_path       = "usm/debug/code, @000001";
+        build_time      = "2025/01/21 12:00:00 -0000";
+        archive_assets  = "usm_assets, @000001";
+        display_info    = "DEBUG BUILD";
+    }
+};
+
+extern debug_build_info  g_build_info;
+
+
 
 extern void* add_debug_menu_entry(debug_menu* menu, debug_menu_entry* entry);
 

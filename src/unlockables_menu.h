@@ -1,14 +1,23 @@
 #pragma once
 
 #include "femenu.h"
+#include "panelfile.h"
 
 struct FEMenuSystem;
 struct PanelQuad;
 struct menu_nav_bar;
 
+
+struct unlockable_item {
+    PanelQuad *icon;
+    PanelQuad *icon_highlight;
+    nglTexture *full_icon_texture;
+    nglTexture *big_icon_texture;
+};
+
 struct unlockables_menu : FEMenu {
     FEMenuSystem *field_2C;
-    int field_30;
+    PanelFile *panel_file; 
     menu_nav_bar *field_34;
     PanelQuad *field_38[14];
     int field_70;
@@ -46,10 +55,15 @@ struct unlockables_menu : FEMenu {
     int field_F0;
     int field_F4;
     int field_F8;
-    int field_FC;
+    int field_FC;                       
+
+
 
     //0x00614020
     unlockables_menu(FEMenuSystem *a2, int a3, int a4);
+	
+		//0064BF80
+    void sub_64BF80(PanelFile *a1, int a2);
 
     //0x00614110
     //virtual
@@ -66,6 +80,16 @@ struct unlockables_menu : FEMenu {
     //0x0062D510
     //virtual
     void OnActivate();
+	
+	void Init();
+	
+
+
+    void OnDeactivate();
+	
+    void sub_62D6D0(int a2);
+
+
 	
 
 };

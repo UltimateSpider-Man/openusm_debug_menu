@@ -120,6 +120,8 @@ void PauseMenuSystem::LoadAll() {
     }
 }
 
+
+
 void PauseMenuSystem::Draw() {
     THISCALL(0x0060BF10, this);
 }
@@ -135,7 +137,7 @@ void PauseMenuSystem::Activate(int a2, bool a3)
         this->MakeActive(a2);
         
         if (a3)
-            g_game_ptr->pause();
+        g_game_ptr->pause();
         pause_menu_save_load_display* v4 = this->field_34;
         this->field_38 = static_cast<uint8_t>(comic_panels::game_play_panel()->field_67);
     
@@ -260,6 +262,11 @@ void PauseMenuSystem_patch() {
 	{
         FUNC_ADDRESS(address, &PauseMenuSystem::OnButtonPress);
         set_vfunc(0x00893E38, address);
+	
+    }
+		{
+        FUNC_ADDRESS(address, &PauseMenuSystem::Draw);
+        set_vfunc(0x00893E20, address);
 	
     }
     return;

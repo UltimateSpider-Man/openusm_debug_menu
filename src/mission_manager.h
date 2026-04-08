@@ -73,12 +73,8 @@ struct mission_manager {
 	
 	int is_story_mission_active();
 
-bool sub_5C5940();
 
-
-bool sub_5C58D0();
-
-
+    bool sub_5C58D0();
 
     mission_table_container *get_global_table()
     {
@@ -98,6 +94,13 @@ bool sub_5C58D0();
 
     //0x005DBCD0
     void sort_district_priorities();
+	
+ bool	is_restartable_mission() const;
+ bool	is_quittable_story_mission() const;
+ 
+ bool isCurrentScript(const char* scriptName) const;
+ 
+	
 
     void sub_5BACA0(Float a2);
 
@@ -151,6 +154,9 @@ bool sub_5C58D0();
     _std::vector<mString> * get_mission_strings();
 
     void set_mission_key_po(const po &a2);
+	
+	bool sub_5C24C0();
+
 
     po get_mission_key_po() const;
 

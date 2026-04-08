@@ -40,6 +40,34 @@ mission_manager::mission_manager()
     }
 }
 
+bool mission_manager::sub_5C58D0(){
+
+        THISCALL(0x005C58D0, this);
+    
+}
+
+    // Helper to compare current script name
+    bool mission_manager::isCurrentScript(const char* scriptName) const
+    {
+        if (!this->m_script)
+            return false;
+        return strncmp(this->m_script->field_0.guts, scriptName, 65535u) == 0;
+    }
+    // sub_5C58D0 - Check if mission can be restarted
+    bool mission_manager::is_restartable_mission() const
+    {
+        return !isCurrentScript("") 
+            && !isCurrentScript("s02_workout");
+    }
+
+    // sub_5C5940 - Check if current story mission can be quit
+    bool mission_manager::is_quittable_story_mission() const
+    {
+        return this->m_script
+            && mission_manager::s_inst->is_story_mission_active()
+            && !isCurrentScript("lm_storm_races");
+    }
+
 int mission_manager::is_story_mission_active()
 {
     TRACE("mission_manager::is_story_mission_active");
@@ -67,18 +95,7 @@ int mission_manager::is_story_mission_active()
     }
 }
 
-bool mission_manager::sub_5C58D0()
-{
-  return strncmp(this->m_script->field_0.guts, "s01_fathers_pride", 65535u)
-      && strncmp(this->m_script->field_0.guts, "s02_workout", 65535u);
-	  
-	  return (bool)THISCALL(0x005C58D0,this);
-}
 
-bool mission_manager::sub_5C5940()
-{
-       return (bool)THISCALL(0x005C5940,this);
-}
 
 void mission_manager::prepare_unload_script()
 {
@@ -544,6 +561,14 @@ void mission_manager::update_hero_switch()
         }
     }
 }
+
+
+bool mission_manager::sub_5C24C0()
+{
+  return THISCALL(0x005C24C0, this);
+}
+
+
 
 entity_base *mission_manager::get_mission_key_entity() const
 {
