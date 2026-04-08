@@ -30,6 +30,7 @@ How to build and install:
 * use this command for install zlib1g: `sudo apt-get -y install libz-mingw-w64-dev`
 * clone assimp on openusm folder with git clone https://github.com/assimp/assimp.git or download assimp at this link: https://drive.google.com/file/d/1z3HkGE3ZC09oPaye813vBkmp6qNZQvqV/view?usp=sharing
 * install DUSE_UPX: `cmake -DUSE_UPX=ON` for compile USM.exe Stripped
+* download icon files for compile exe : https://drive.google.com/file/d/1XQsbmFmf3-qrQnVphvDOpzjJyeIWGINe/view?usp=sharing
 
 
 License
