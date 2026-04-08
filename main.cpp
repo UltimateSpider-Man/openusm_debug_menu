@@ -1,5 +1,10 @@
 #include "forwards.h"
+
+#include <unordered_map>
 #include "resource_versions.h"
+
+#include "ltd_edition.h"
+#include "nal_skeleton.h"
 #include "main.h"
 #include "aeps.h"
 #include "ai_find_best_swing_anchor.h"
@@ -264,6 +269,8 @@
 #include "worldly_pack_slot.h"
 #include "script_file_loader.h"
 
+#include "replay_missions.h"
+
 #include "main_menu_credits.h"
 
 #include "input.h"
@@ -309,6 +316,7 @@
 namespace fs = std::filesystem;
 
 std::map<uint32_t, Mod> Mods;
+std::unordered_map<std::string, std::filesystem::path> ModFileOverrides;
 
 void register_class_and_create_window(LPCSTR lpClassName,
                                       LPCSTR lpWindowName,
@@ -437,6 +445,11 @@ BOOL install_patches()
         REDIRECT(0x007700D9, nglLoadMeshFileInternal);
         REDIRECT(0x00778649, nglLoadMeshFileInternal);
 		
+		        REDIRECT(0x004DCE59, entity_handle_manager::find_entity);
+        REDIRECT(0x0055D23E, entity_handle_manager::find_entity);
+		    
+
+
 
         // these funcs mysteriously are only used for TGA
         // and kinda look like it too, but I don't see em being used...
@@ -1353,9 +1366,7 @@ int __stdcall myWinMain(HINSTANCE hInstance,
     if (!CreateMutexA(nullptr, true, "USM") || GetLastError() == ERROR_ALREADY_EXISTS) {
         return 0;
     }
-	FEMenuSystem *a2;
-    main_menu_credits(a2, 1, 1);
-	
+
     g_settings() = new Settings{"Activision", "Ultimate Spider-Man"};
 
     char v6;
@@ -1377,8 +1388,7 @@ int __stdcall myWinMain(HINSTANCE hInstance,
         break;
     }
 
-		
-	char Dest[100];
+    char Dest[100];
     sprintf(Dest, "data\\usm_lt%c.usm", v6);
 
     g_fileUSM() = create_usm_file(Dest, nullptr);
@@ -1393,29 +1403,6 @@ int __stdcall myWinMain(HINSTANCE hInstance,
         MessageBoxA(nullptr, v7, v162, 0x10u);
         return 0;
     }
-	
-		char v15;
-		FILE *v16;
-	 switch ( dword_96B430() )
-    {
-      case 1:
-        v15 = 102;
-        break;
-      case 2:
-        v15 = 103;
-        break;
-      case 3:
-        v15 = 115;
-        break;
-      case 4:
-        v15 = 105;
-        break;
-      default:
-        v15 = 101;
-        break;
-    }
-    sprintf(Dest, "data\\packs\\blfusm%c.dat", v15);
-    v16 = fopen(Dest, "rb");
 
     if (!sub_81C2A0(9u, 0, 99u)) {
         auto *v162 = get_msg(g_fileUSM(), "MSGBOX_ERROR");
@@ -4195,101 +4182,10 @@ static int g_counter = 0;
 // Based on Script menu character listing
 // =============================================================================
 static const char* CHARS[] = {
-    // -------------------------------------------------------------------------
-    // HEROES
-    // -------------------------------------------------------------------------
-    "usm_blacksuit",            // Black Suit Spider-Man
-    "usm_wrestling",            // Wrestling Spider-Man
-    "venom_eddie",              // Venom (Eddie Brock)
-    "venom_spider",             // Venom Spider form
-    "arachno_man",              // Arachno-Man
-    "arachno_man_face_morph",
-    
-    // -------------------------------------------------------------------------
-    // MAIN VILLAINS
-    // -------------------------------------------------------------------------
-    "carnage",                  // Carnage
-    "carnage_face_morph",
-    "rhino",                    // Rhino
-    "electro_suit",             // Electro (suited)
-    "electro_naked",            // Electro (naked/transformed)
-    "shocker",                  // Shocker
-    "beetle",                   // Beetle
-    "beetle_face_morph",
-    "boomerang",                // Boomerang
-    "boomerang_face_morph",
-    "wolverine",                // Wolverine
-    
-    // -------------------------------------------------------------------------
-    // ALEX O'HIRN (Rhino civilian identity)
-    // -------------------------------------------------------------------------
-    "alex_ohirn",
-    "alex_ohirn_face_morph",
-    "alex_ohirn_prison",
-    "alex_ohirn_prison_face_morph",
-    
-    // -------------------------------------------------------------------------
-    // EDDIE BROCK (Venom civilian identity)
-    // -------------------------------------------------------------------------
-    "eddie_brock",
-    "eddie_brock_face_morph",
-    "eddie_brock_sr",           // Eddie Brock Sr. (father)
-    "eddie_brock_sr_face_morph",
-    
-    // -------------------------------------------------------------------------
-    // BOLIVAR TRASK
-    // -------------------------------------------------------------------------
-    "bolivar_trask_old",
-    "bolivar_trask_old_face_morph",
-    
-    // -------------------------------------------------------------------------
-    // GANG MEMBERS - FTB (Freaks)
-    // -------------------------------------------------------------------------
-    "gang_ftb_base",
-    "gang_ftb_boss",
-    "gang_ftb_lt",
-    
-    // -------------------------------------------------------------------------
-    // GANG MEMBERS - MERCS (Mercenaries)
-    // -------------------------------------------------------------------------
-    "gang_mercs_base",
-    "gang_mercs_boss",
-    "gang_mercs_lt",
-    
-    // -------------------------------------------------------------------------
-    // GANG MEMBERS - SKINS
-    // -------------------------------------------------------------------------
-    "gang_skin_base",
-    "gang_skin_boss",
-    "gang_skin_lt",
-    
-    // -------------------------------------------------------------------------
-    // GANG MEMBERS - SRK (Sharks)
-    // -------------------------------------------------------------------------
-    "gang_srk_base",
-    "gang_srk_boss",
-    "gang_srk_lt",
-    
-    // -------------------------------------------------------------------------
-    // GMU CIVILIANS (Generic Metropolitan Unit)
-    // -------------------------------------------------------------------------
-    "gmu_businessman",
-    "gmu_child_male",
-    "gmu_cop_fat",
-    "gmu_cop_thin",
-    "gmu_cop_thin_igc",          // In-Game Cinematic variant
-    "gmu_jogger_fem",
-    "gmu_lab_fem",
-    "gmu_man",
-    "gmu_medic_fem",
-    
-    // -------------------------------------------------------------------------
-    // PEDESTRIANS
-    // -------------------------------------------------------------------------
     "ped_fem",
     "ped_male",
-    
-    nullptr
+	"gang1"
+
 };
 
 // =============================================================================
@@ -4623,7 +4519,9 @@ void debug_menu::init() {
 }
 #ifdef _WIN32
 #define _USE_MATH_DEFINES
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #endif
 
 
@@ -4689,7 +4587,7 @@ void custom()
 #include "fe_health_widget.h"
 
 
-constexpr auto NUM_HEROES = 24u;
+constexpr auto NUM_HEROES = 25u;
 
 const char* hero_list[NUM_HEROES] = {
     "ultimate_spiderman",
@@ -4706,6 +4604,7 @@ const char* hero_list[NUM_HEROES] = {
     "rhino",
     "green_goblin",
     "army_mary_jane",
+	"mary_jane",
     "venarge",
     "electro_suit",
     "electro_nosuit",
@@ -4773,7 +4672,6 @@ level_descriptor_t* get_level_descriptors(int* arg0)
 static int main_flow[] = { 5, 6, 14 };
 game_process mainflow_proc{ "main", main_flow, 3 };
 
-#pragma once
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -4783,7 +4681,9 @@ game_process mainflow_proc{ "main", main_flow, 3 };
 #include <vector>
 
 #if defined(_WIN32)
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <shellapi.h>
 #include <windows.h>
 #else // POSIX (including WSL)
@@ -5022,7 +4922,74 @@ wait( int seconds )
         }        }        }
  
 
+struct RebootRequest {
+    bool        pending = false;
+    std::string scene;
+    std::string args;
+};
 
+inline RebootRequest g_reboot{};
+
+// =====================================================================
+// Teardown helpers
+//
+// Fill these in with the actual reversed engine calls you have.
+// They are separated so you can enable/disable subsystems as you
+// discover them.
+// =====================================================================
+inline void TeardownCurrentLevel()
+{
+    // --- Graphics / world ------------------------------------------
+    if (g_game_ptr) {
+        g_game_ptr->clear_screen();
+    }
+
+    // --- Sound -----------------------------------------------------
+    sound_manager::delete_inst();
+
+    // --- Add more subsystem teardowns here as you reverse them -----
+    // resource_manager::flush();
+    // entity_manager::destroy_all();
+    // physics::shutdown();
+    // mission_manager::unload();
+    // world::unload_current_level();
+}
+
+inline void LoadLevel(const std::string& sceneName)
+{
+    // --- Option A: let the engine re-read from INI -----------------
+    // The game's own startup path already reads SCENE_NAME from the INI.
+    // If you can invoke that same path:
+    //
+    //     g_game_ptr->load_level(sceneName.c_str());
+    //
+    // --- Option B: re-init subsystems manually ---------------------
+    //     sound_manager::create_inst();
+    //     resource_manager::load_scene(sceneName.c_str());
+    //     g_game_ptr->begin_scene();
+    //
+    // --- Option C: call the game's full init sequence ---------------
+    //     game_init();          // your reversed init function
+    //
+    // Uncomment / replace with whatever you have reversed.
+    // For now this is a placeholder — fill in the actual call:
+
+    SelectScene(sceneName.c_str());
+}
+
+inline void PollReboot()
+{
+    if (!g_reboot.pending)
+        return;
+
+    g_reboot.pending = false;
+
+    TeardownCurrentLevel();
+    LoadLevel(g_reboot.scene);
+
+    g_reboot.scene.clear();
+    g_reboot.args.clear();
+}
 
 
 [[noreturn]] inline void RestartWithScene(const std::string& sceneName,
@@ -5091,6 +5058,8 @@ constexpr std::array<const char*, 10> kLevelList{
     restart(extraArgs);                              // will not return
 }
 
+
+
 void level_select_handler(debug_menu_entry* entry)
 {
     // entry->m_id was set to the index when you built the menu
@@ -5101,7 +5070,7 @@ void level_select_handler(debug_menu_entry* entry)
         return;      
 
 
-	
+	PollReboot();
 	RestartWithScene(kLevelList[idx]);
 }
 
@@ -5690,10 +5659,7 @@ bool __fastcall slf__create_debug_menu_entry(script_library_class::function* fun
 }
 
 
-void onFrame() {
-    updateAnimatedMods();  // Advance all GIF animations
-    // ... rest of rendering
-}
+
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -5707,6 +5673,7 @@ BOOL install_redirects()
 
         REDIRECT(0x005AC347, hook_controlfp);
     }
+	
 
     REDIRECT(0x005AC52F, parse_cmd);
 
@@ -5720,16 +5687,20 @@ BOOL install_redirects()
 	FEMultiLineText_patch();
 	
 	
+	// ltd_edition_patch();
 	
-	
-	
-	        FrontEndMenuSystem_patch();
+	     //   FrontEndMenuSystem_patch();
 			
 			script_file_loader_patch();
 			
-			pause_menu_root_patch();
+		//	pause_menu_root_patch();
+			
+						replay_missions_patch();
+			
 			
 			pause_menu_goals_patch();
+			
+			        PauseMenuSystem_patch();
 			
 			
 			unlockables_menu_patch();
@@ -5746,6 +5717,11 @@ BOOL install_redirects()
     Timer_patch();
 	
 	script_lib_debug_menu_patch();
+	
+	
+	//main_menu_credits_patch();
+	
+		
 
     //REDIRECT(0, sub_5952D0);
 
@@ -5821,10 +5797,16 @@ BOOL install_redirects()
     }
 	
 
-
     SET_JUMP(0x0077A870, nglLoadTextureTM2);
-	
-	
+	SET_JUMP(0x5EF340, inverse_kinematics::compute_bend_plane_normal);
+    SET_JUMP(0x5EEEE0, inverse_kinematics::compute_arm_elbow_bend_direction);
+    //SET_JUMP(0x5EF100, inverse_kinematics::compute_arm_elbow_bend_direction_mirrored);
+
+    SET_JUMP(0x797210, inverse_kinematics::nalIKMap2DTo3D);
+    SET_JUMP(0x797070, inverse_kinematics::nalIKSolve2D);
+    SET_JUMP(0x5EEC20, inverse_kinematics::solve_two_bone);
+    SET_JUMP(0x5F16E0, inverse_kinematics::DecomposeIKSpin);
+    	
 
     return true;
 
@@ -5842,6 +5824,8 @@ BOOL install_redirects()
     game_settings_patch();
 
     ngl_patch();
+	
+	REDIRECT(0x00822556, myWinMain);
 
     //standalone patches
     if constexpr (1)
@@ -5857,6 +5841,7 @@ BOOL install_redirects()
         slab_allocator_patch();
 
         nfl_system_patch();
+		
     }
 
     if constexpr (0)
@@ -6045,7 +6030,7 @@ BOOL install_redirects()
 
     if constexpr (0)
     {
-        PauseMenuSystem_patch();
+
 
         cg_mesh_patch();
 
@@ -6391,7 +6376,7 @@ BOOL install_redirects()
             assert(0);
         }
 
-        //redirect_winmain();
+
 
 #if 0
         
@@ -6493,8 +6478,13 @@ BOOL install_redirects()
 }
 
 
+
 #include "mod.h"  // Updated mod.h with GIF support
 #include <fstream>
+
+// FBX Integration for nglLoadMeshFileInternal
+// This file shows how to integrate FBX loading into the existing mesh loading system
+
 
 namespace fs = std::filesystem;
 
@@ -6541,8 +6531,7 @@ void enumerate_mods() {
     }
 
 #   if MOD_MESH_DBG_REPLACE_ALL
-        dbgReplaceMesh = getMod(0x1189ab87, TLRESOURCE_TYPE_MESH_FILE);
-		dbgReplaceMesh = getMod(0xCB5B8BA9, TLRESOURCE_TYPE_MESH_FILE);
+        dbgReplaceMesh = getMod(0x1189ab87, TLRESOURCE_TYPE_MESH);
 #   endif
 }
 
@@ -6556,7 +6545,10 @@ BOOL install_hooks() {
         restore_text_perms();
 }
 
-#include "modloader.h"
+
+
+
+//#include "modloader.h"
 
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, [[maybe_unused]] LPVOID lpvReserved) {
     //printf("DLLMain %lu 0x%08X\n", fdwReason, (int) lpvReserved);
@@ -6584,14 +6576,14 @@ if (strstr(args, " -windowed"))
         bool res = install_hooks();
         if (res) 
         enumerate_mods();
-			         init_hooks();
+			         //init_hooks();
 		    os_developer_options::os_developer_init();
             ini_parser::parse("debug_menu.ini", os_developer_options::instance);
         return res;
 		
 
     } else if (fdwReason == DLL_PROCESS_DETACH) {
-		           destroy_hooks();
+		          // destroy_hooks();
         FreeConsole();
 
     }
