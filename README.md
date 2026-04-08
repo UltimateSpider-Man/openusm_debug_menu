@@ -32,6 +32,11 @@ How to build and install:
 * install DUSE_UPX: `cmake -DUSE_UPX=ON` for compile USM.exe Stripped
 * download icon files for compile exe : https://drive.google.com/file/d/1XQsbmFmf3-qrQnVphvDOpzjJyeIWGINe/view?usp=sharing
 
+Video about Compiling the Project:
+------------------------
+
+YouTube : https://youtu.be/MU3Nq39y1j8
+
 
 License
 ------------
