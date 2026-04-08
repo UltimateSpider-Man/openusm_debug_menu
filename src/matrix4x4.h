@@ -122,6 +122,19 @@ struct matrix4x4 {
     //0x00588390
     void scale(Float a2);
 
+    matrix4x4* compose_from_basis(vector4d* a2,
+        vector4d* a3,
+        vector4d* a4,
+        vector4d* a5)
+    {
+        matrix4x4* this_1 = this;
+        this->arr[0] = *a2;
+        this->arr[1] = *a3;
+        this->arr[2] = *a4;
+        this->arr[3] = *a5;
+        return this_1;
+    }
+
     const char *to_string() const;
 };
 
@@ -136,3 +149,14 @@ extern vector3d sub_501B20(const matrix4x4 &a2, const vector3d &a3);
 extern matrix4x3 sub_413770(const matrix4x4 &arg4);
 
 extern void matrix4x4_patch();
+
+
+using local_to_world_t = int(__cdecl*)(matrix4x4*, matrix4x4*, matrix4x4*);
+using ProjectPointOntoLineXform_t = vector3d * (__cdecl*)(vector3d*, vector3d*, matrix4x4*);
+
+[[maybe_unused]]
+inline local_to_world_t local_to_world = reinterpret_cast<local_to_world_t>(0x005FE000);
+
+
+[[maybe_unused]]
+inline ProjectPointOntoLineXform_t ProjectPointOntoLineXform = reinterpret_cast<ProjectPointOntoLineXform_t>(0x005FF390);
