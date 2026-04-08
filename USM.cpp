@@ -3592,7 +3592,9 @@ void debug_menu::init() {
 }
 #ifdef _WIN32
 #define _USE_MATH_DEFINES
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #endif
 
 void render_current_debug_menu() {
