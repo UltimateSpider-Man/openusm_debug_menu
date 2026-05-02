@@ -13,7 +13,6 @@ Requiments:
 * MinGW-w64 compiler
 * zlib1g
 * assimp
-* python-pip
 
 
 
