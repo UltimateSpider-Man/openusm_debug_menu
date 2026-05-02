@@ -9,10 +9,11 @@ Current Status
 The engine is not complete and is at the prototyping stage.
 
 Requiments:
-* Linux or Ubuntu on Windows 10
+* Linux or Ubuntu WSL on Windows 10
 * MinGW-w64 compiler
 * zlib1g
 * assimp
+* python-pip
 
 
 
@@ -29,8 +30,7 @@ How to build and install:
 * Copy the compiled `binkw32.dll` from `build` directory to the game's folder.
 * use this command for install zlib1g: `sudo apt-get -y install libz-mingw-w64-dev`
 * clone assimp on openusm folder with git clone https://github.com/assimp/assimp.git or download assimp at this link: https://drive.google.com/file/d/1z3HkGE3ZC09oPaye813vBkmp6qNZQvqV/view?usp=sharing
-* install DUSE_UPX: `cmake -DUSE_UPX=ON` for compile USM.exe Stripped
-* download icon files for compile exe : https://drive.google.com/file/d/1XQsbmFmf3-qrQnVphvDOpzjJyeIWGINe/view?usp=sharing
+* install for compile USM.exe 'pip install lief' 
 
 Video about Compiling the Project:
 ------------------------
