@@ -30,7 +30,6 @@ How to build and install:
 * Copy the compiled `binkw32.dll` from `build` directory to the game's folder.
 * use this command for install zlib1g: `sudo apt-get -y install libz-mingw-w64-dev`
 * clone assimp on openusm folder with git clone https://github.com/assimp/assimp.git or download assimp at this link: https://drive.google.com/file/d/1z3HkGE3ZC09oPaye813vBkmp6qNZQvqV/view?usp=sharing
-* install for compile USM.exe 'pip install lief' 
 
 Video about Compiling the Project:
 ------------------------
